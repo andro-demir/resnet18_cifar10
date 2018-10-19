@@ -85,6 +85,8 @@ class resnet(nn.Module):
                  num_blocks, 
                  num_classes=10):
         super(resnet, self).__init__()
+        self.in_planes = 64
+
         self.conv1 = nn.Conv2d(in_channels=3, out_channels=64, kernel_size=7, 
                                stride=(1,2,2), padding=(3,3,3), bias=False)
         self.bn1 = nn.BatchNorm2d(num_features=64)
@@ -95,9 +97,15 @@ class resnet(nn.Module):
         self.layer2 = self.make_layer(block, 128, num_blocks[1], stride=2)
         self.layer3 = self.make_layer(block, 256, num_blocks[2], stride=2)
         self.layer4 = self.make_layer(block, 512, num_blocks[3], stride=2)
-        self.fc = nn.Linear(512*block.expansion, num_classes)
+        self.dense = nn.Linear(512*block.expansion, num_classes)
 
-        self.avgpool = nn.AvgPool3d(kernel_size=(dim1,dim2,dim3), stride=1)
+    def make_layer(self, block, planes, num_blocks, stride):
+        strides = [stride] + [1]*(num_blocks-1)
+        layers = []
+        for stride in strides:
+            layers.append(block(self.in_planes, planes, stride))
+            self.in_planes = planes * block.expansion
+        return nn.Sequential(*layers)
 
     def forward(self, x):
         x = self.conv1(x)
@@ -110,9 +118,9 @@ class resnet(nn.Module):
         x = self.layer3(x)
         x = self.layer4(x)
 
+        x = F.avg_pool2d(x, 4)
         x = x.view(x.size(0), -1)
-        x = self.fc(x)
-
+        x = self.linear(x)
         return x
 
 
