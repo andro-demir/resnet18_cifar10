@@ -159,7 +159,8 @@ def save_model(net):
 def load_model(net):
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     try:
-        net.load_state_dict(torch.load("Model/model.model")) 
+        net.load_state_dict(torch.load("Model/model.model", 
+                                       map_location='cpu'))
     except RuntimeError:
         print("Runtime Error!")
         print(("Saved model must have the same network architecture with"
@@ -202,8 +203,8 @@ def train():
     Classifies the image whose path entered on the terminal.
 '''
 def test(image_path):
-    classes = ('plane', 'car', 'bird', 'cat',
-               'deer', 'dog', 'frog', 'horse', 'ship', 'truck')
+    classes = ('plane', 'car', 'bird', 'cat', 'deer', 'dog', 
+               'frog', 'horse', 'ship', 'truck')
     img_tensor = dp.load_test_image(image_path).unsqueeze(0)
     net = ResNet18()
     load_model(net)
@@ -230,8 +231,8 @@ def save_conv1(img, N=6):
         ax1.set_yticklabels([])
 
     plt.subplots_adjust(wspace=0.1, hspace=0.1)
-    plt.show()
     plt.savefig('CONV_rslt.png')    
+    plt.show()
 
 
 if __name__ == "__main__":
