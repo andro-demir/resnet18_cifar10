@@ -1,1 +1,1 @@
-# resnet56_cifar10
+# resnet18_cifar10
