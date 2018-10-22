@@ -34,7 +34,8 @@ def load_cifar10():
 def load_test_image(image_path):
     image = Image.open(image_path)
     image.show()
-    preprocess = chained_transformation()
+    image = image.resize((32, 32))
+    preprocess = normalize_testset()
     img_tensor = preprocess(image)
     return img_tensor
 

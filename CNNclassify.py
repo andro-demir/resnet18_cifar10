@@ -159,8 +159,7 @@ def save_model(net):
 def load_model(net):
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     try:
-        net.load_state_dict(torch.load("Model/model.model", 
-                            map_location='gpu')) 
+        net.load_state_dict(torch.load("Model/model.model")) 
     except RuntimeError:
         print("Runtime Error!")
         print(("Saved model must have the same network architecture with"
@@ -208,9 +207,31 @@ def test(image_path):
     img_tensor = dp.load_test_image(image_path).unsqueeze(0)
     net = ResNet18()
     load_model(net)
+    # visualizes the outputs of the first CONV layer and saves in a file: 
+    first_conv = net.conv1(img_tensor)
+    first_conv = torchvision.utils.make_grid(first_conv, nrow=6, padding=8).\
+                                                           detach().numpy()
+    save_conv1(first_conv)
+    # classifies the test image
     outputs = net(img_tensor)
     _, predicted = torch.max(outputs.data, 1)
     print("Predicted: %s" %classes[predicted[0]])
+
+'''
+    Visualizes and saves the output of the first convolutional layer
+'''
+def save_conv1(img, N=6):
+    fig = plt.figure(figsize=(N, N))
+    for i in range(img.shape[0]):
+        ax1 = fig.add_subplot(N, N, i+1)
+        ax1.imshow(img[i])
+        ax1.axis('off')
+        ax1.set_xticklabels([])
+        ax1.set_yticklabels([])
+
+    plt.subplots_adjust(wspace=0.1, hspace=0.1)
+    plt.show()
+    plt.savefig('CONV_rslt.png')    
 
 
 if __name__ == "__main__":
