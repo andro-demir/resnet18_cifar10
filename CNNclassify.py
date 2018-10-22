@@ -1,5 +1,5 @@
-import fire
 import numpy as np
+import fire
 import data_processing as dp
 import torch
 import torch.nn as nn
@@ -104,12 +104,13 @@ def set_optimization(model):
     forward + backward prop for 1 epoch
     prints the loss for every minibatch (2000 images)
 '''
-def train_model(model, trainloader, criterion, optimizer, epoch):
+def train_model(model, trainloader, criterion, optimizer, epoch, device):
     running_loss = 0.0
     for i, data in enumerate(trainloader, 0):
         # get the inputs
         inputs, labels = data
-
+        inputs, labels = inputs.to(device), labels.to(device)
+        
         # zero the parameter gradients
         optimizer.zero_grad()
 
@@ -130,11 +131,12 @@ def train_model(model, trainloader, criterion, optimizer, epoch):
     Tests the model accuracy over the test data in one epoch
     Prints the average loss
 '''
-def test_model(model, testloader, epoch):
+def test_model(model, testloader, epoch, device):
     correct, total = 0, 0
     with torch.no_grad():
         for data in testloader:
             images, labels = data
+            images, labels = images.to(device), labels.to(device)
             outputs = model(images)
             _, predicted = torch.max(outputs.data, 1)
             total += labels.size(0)
@@ -182,13 +184,13 @@ def train():
     trainloader, testloader = dp.batch_data(trainset, testset)
     # Loads the model and the training/testing functions:
     net = ResNet18()
-    net, _ = set_device(net)
+    net, device = set_device(net)
     criterion, optimizer, epochs = set_optimization(net)
     
     # Print the train and test accuracy after every epoch:
     for epoch in range(epochs):
-        train_model(net, trainloader, criterion, optimizer, epoch)
-        test_model(net, testloader, epoch)
+        train_model(net, trainloader, criterion, optimizer, epoch, device)
+        test_model(net, testloader, epoch, device)
 
     print('Finished Training')   
     # Save the model:
@@ -200,7 +202,7 @@ def train():
 def test(image_path):
     classes = ('plane', 'car', 'bird', 'cat',
                'deer', 'dog', 'frog', 'horse', 'ship', 'truck')
-    img_tensor = dp.load_test_image(image_path).unsqueeze(0)
+    img_tensor = dp.load_test_image(image_path).unsqueeze(0).to(device)
     net = ResNet18()
     load_model(net)
     outputs = net(img_tensor)
