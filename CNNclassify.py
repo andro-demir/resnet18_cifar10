@@ -96,8 +96,9 @@ def set_optimization(model):
     # This criterion combines nn.LogSoftmax() and nn.NLLLoss() 
     # in one single clas
     criterion = nn.CrossEntropyLoss()
-    optimizer = optim.SGD(model.parameters(), lr=0.001, momentum=0.9)
-    epochs = 5
+    optimizer = optim.SGD(model.parameters(), lr=0.001, momentum=0.9, 
+                          weight_decay=2e-4)
+    epochs = 10
     return criterion, optimizer, epochs
 
 '''
@@ -156,8 +157,10 @@ def save_model(net):
     Loads the pretrained network. 
 '''
 def load_model(net):
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     try:
-        net.load_state_dict(torch.load("Model/model.model"))
+        net.load_state_dict(torch.load("Model/model.model", 
+                            map_location='gpu')) 
     except RuntimeError:
         print("Runtime Error!")
         print(("Saved model must have the same network architecture with"
@@ -169,7 +172,7 @@ def load_model(net):
     Trains network using GPU, if available. Otherwise uses CPU.
 '''
 def set_device(net):
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     print("Training on: %s\n" %device)
     # .double() will make sure that  MLP will process tensor
     # of type torch.DoubleTensor:
@@ -202,7 +205,7 @@ def train():
 def test(image_path):
     classes = ('plane', 'car', 'bird', 'cat',
                'deer', 'dog', 'frog', 'horse', 'ship', 'truck')
-    img_tensor = dp.load_test_image(image_path).unsqueeze(0).to(device)
+    img_tensor = dp.load_test_image(image_path).unsqueeze(0)
     net = ResNet18()
     load_model(net)
     outputs = net(img_tensor)
