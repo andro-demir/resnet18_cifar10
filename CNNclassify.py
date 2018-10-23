@@ -40,6 +40,8 @@ class basic_block(nn.Module):
 '''
     Defines the network architecture, activations and regularizers.
     Forward prop.
+    First convolutional layer has kernel size 5x5, stride 1 and the 
+    total number of kernels 32 as conditioned by the project assignment: 
 '''
 class resnet(nn.Module):
     def __init__(self, 
@@ -48,9 +50,6 @@ class resnet(nn.Module):
                  num_classes=10):
         super(resnet, self).__init__()
         self.in_planes = 32
-        # First convolutional layer must have the kernel size 5x5,
-        # stride 1 and the total number of kernels 32, according to the 
-        # project assignment: 
         self.conv1 = nn.Conv2d(in_channels=3, out_channels=32, kernel_size=5, 
                                stride=1, padding=2, bias=False)
         self.bn1 = nn.BatchNorm2d(num_features=32)
@@ -154,10 +153,9 @@ def save_model(net):
     print("Model saved successfully.")
 
 '''
-    Loads the pretrained network. 
+    Loads the network trained by GPU to CPU for inference. 
 '''
 def load_model(net):
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     try:
         net.load_state_dict(torch.load("Model/model.model", 
                                        map_location='cpu'))
