@@ -21,5 +21,5 @@ python NN_classifier.py train
 
 ### Testing Model
 ```
-python NN_classifier.py test
+python NN_classifier.py test <image_path>
 ```
