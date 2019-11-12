@@ -2,11 +2,11 @@
 
 ### Prerequisites
 ```
--numpy
--fire
--torch
--torchvision
--matplotlib
+-numpy (1.17.3)
+-fire (0.2.1)
+-torch (1.3.1)
+-torchvision (0.4.2)
+-matplotlib (3.1.1)
 ```
 
 ### Downloading CIFAR Dataset
